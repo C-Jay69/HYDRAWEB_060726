@@ -13,7 +13,7 @@ export const generateWebsite = async (prompt: string, apiKey: string): Promise<A
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'google/gemini-flash-1.5-exp', // Using a high-performance free/cheap model
+      model: 'google/gemini-flash-1.5', // Updated to the stable model ID
       messages: [
         {
           role: 'system',
@@ -49,6 +49,10 @@ export const generateWebsite = async (prompt: string, apiKey: string): Promise<A
 
   const data = await response.json();
   const content = JSON.parse(data.choices[0].message.content);
+
+  if (!content.html || !content.css) {
+    throw new Error('The AI failed to generate the website structure. Please try a different prompt.');
+  }
 
   return {
     html: content.html,

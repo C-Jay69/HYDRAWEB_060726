@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import grapesjs, { Editor } from 'grapesjs';
 import GjsEditor, { Canvas, BlocksProvider } from '@grapesjs/react';
 import 'grapesjs/dist/css/grapes.min.css';
@@ -46,9 +47,52 @@ const CustomBlocks = () => {
   );
 };
 
-const EditorPage: React.FC = () => {
-  const onEditor = (editor: Editor) => {
-    console.log('Editor loaded', editor);
+const EditorPage: React.FC<{ content?: { html: string; css: string } }> = () => {
+  const [editor, setEditor] = useState<Editor | null>(null);
+
+  const onEditor = (editorInstance: Editor) => {
+    console.log('Editor loaded', editorInstance);
+    setEditor(editorInstance);
+
+    if (content) {
+      // Clear any previous local storage content to ensure a fresh AI start
+      editorInstance.setComponents('');
+      editorInstance.setStyleSheet('');
+
+      editorInstance.setComponents(content.html);
+      editorInstance.setStyleSheet(content.css);
+    }
+  };
+
+  const exportHtml = () => {
+    if (!editor) return;
+
+    const html = editor.getHtml();
+    const css = editor.getCss();
+
+    const fullDocument = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exported Website</title>
+  <style>
+    ${css}
+  </style>
+</head>
+<body>
+  ${html}
+</body>
+</html>`;
+
+    const blob = new Blob([fullDocument], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -58,7 +102,13 @@ const EditorPage: React.FC = () => {
         grapesjs={grapesjs}
         options={{
           height: '100%',
-          storageManager: false,
+          storageManager: {
+            type: 'local',
+            autosave: true,
+            hostname: 'localhost',
+            plugins: [gjsBasicBlocks],
+            storageKey: 'hydraweb-project-save',
+          },
           plugins: [gjsBasicBlocks],
         }}
         onReady={onEditor}
@@ -68,13 +118,39 @@ const EditorPage: React.FC = () => {
           <div className="flex items-center justify-between px-4 py-2 bg-[#2d2e2e] border-b border-black/20 text-white shadow-md z-10 shrink-0">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1 bg-[#1e1e1e] p-1 rounded">
-                <button className="p-1 hover:bg-white/10 rounded" title="Desktop"><MonitorIcon /></button>
-                <button className="p-1 hover:bg-white/10 rounded" title="Tablet"><TabletIcon /></button>
-                <button className="p-1 hover:bg-white/10 rounded" title="Mobile"><SmartphoneIcon /></button>
+                <button
+                  className="p-1 hover:bg-white/10 rounded"
+                  title="Desktop"
+                  onClick={() => editor?.DeviceManager.setDevice('desktop')}
+                >
+                  <MonitorIcon />
+                </button>
+                <button
+                  className="p-1 hover:bg-white/10 rounded"
+                  title="Tablet"
+                  onClick={() => editor?.DeviceManager.setDevice('tablet')}
+                >
+                  <TabletIcon />
+                </button>
+                <button
+                  className="p-1 hover:bg-white/10 rounded"
+                  title="Mobile"
+                  onClick={() => editor?.DeviceManager.setDevice('mobile')}
+                >
+                  <SmartphoneIcon />
+                </button>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                className="p-1.5 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors"
+                title="Back to Home"
+                onClick={onExit}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              </button>
+              <div className="w-px h-4 bg-white/10 mx-1" />
               <button className="p-1.5 hover:bg-white/10 rounded" title="Grid"><GridIcon /></button>
               <button className="p-1.5 hover:bg-white/10 rounded" title="Preview"><EyeIcon /></button>
               <button className="p-1.5 hover:bg-white/10 rounded" title="Fullscreen"><MaximizeIcon /></button>
@@ -83,7 +159,13 @@ const EditorPage: React.FC = () => {
               <button className="p-1.5 hover:bg-white/10 rounded" title="Undo"><UndoIcon /></button>
               <button className="p-1.5 hover:bg-white/10 rounded" title="Redo"><RedoIcon /></button>
               <div className="w-px h-4 bg-white/10 mx-1" />
-              <button className="p-1.5 hover:bg-white/10 rounded" title="Export"><DownloadIcon /></button>
+              <button
+                className="p-1.5 hover:bg-white/10 rounded"
+                title="Export"
+                onClick={exportHtml}
+              >
+                <DownloadIcon />
+              </button>
               <button className="p-1.5 hover:bg-white/10 rounded" title="Delete"><TrashIcon /></button>
               <button className="p-1.5 hover:bg-white/10 rounded" title="Save"><SaveIcon /></button>
               <div className="w-px h-4 bg-white/10 mx-1" />
