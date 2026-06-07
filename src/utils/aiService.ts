@@ -13,7 +13,7 @@ export const generateWebsite = async (prompt: string, apiKey: string): Promise<A
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'google/gemini-flash-1.5', // Updated to the stable model ID
+      model: 'google/gemma-4-31b-it:free', // Using the user's preferred reliable free model
       messages: [
         {
           role: 'system',
