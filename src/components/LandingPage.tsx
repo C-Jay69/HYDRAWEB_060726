@@ -1,40 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Code, Send, Plus, Mic, Globe, Mail, Copy, User, Rocket, Key, Loader2 } from 'lucide-react';
-import { generateWebsite } from '../utils/aiService';
+import React, { useState } from 'react';
+import { Code, Send, Plus, Mic, Globe, Mail, Copy, User, Rocket } from 'lucide-react';
 
 interface LandingPageProps {
-  onStart: (content: { html: string; css: string }) => void;
+  onStart: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const [prompt, setPrompt] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showKeyInput, setShowKeyInput] = useState(false);
-
-  useEffect(() => {
-    const savedKey = localStorage.getItem('hydraweb_api_key');
-    if (savedKey) setApiKey(savedKey);
-  }, []);
-
-  const handleGenerate = async () => {
-    if (!prompt) return alert('Please enter a prompt first!');
-    if (!apiKey) {
-      setShowKeyInput(true);
-      return alert('Please enter your OpenRouter API key!');
-    }
-
-    setIsLoading(true);
-    try {
-      localStorage.setItem('hydraweb_api_key', apiKey);
-      const content = await generateWebsite(prompt, apiKey);
-      onStart(content);
-    } catch (error: any) {
-      alert(`Error: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-purple-500/30">
@@ -48,7 +20,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </div>
           <span className="text-xl font-bold tracking-tight ml-2">GRAPES STUDIO</span>
         </div>
-
+        
         <div className="flex items-center gap-8 text-sm font-medium text-gray-400">
           <a href="#" className="hover:text-white transition-colors">Pricing</a>
           <a href="#" className="hover:text-white transition-colors">Studio SDK</a>
@@ -82,9 +54,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Let's create a website for your e-commerce store redesign..."
               className="w-full bg-transparent border-none focus:ring-0 text-lg resize-none h-24 text-gray-200 placeholder-gray-600"
-              disabled={isLoading}
             />
-
+            
             <div className="flex items-center justify-between mt-4">
               <div className="flex gap-2">
                 <button className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-purple-400">
@@ -98,62 +69,41 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </div>
 
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setShowKeyInput(!showKeyInput)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${showKeyInput ? 'bg-purple-600 text-white' : 'bg-white/5 border border-white/10 text-gray-500 hover:text-gray-300'}`}
-                >
-                  <Key size={14} />
-                  {apiKey ? 'Key Set' : 'API Key'}
-                </button>
                 <button className="text-gray-500 hover:text-white transition-colors">
                   <Plus size={20} />
                 </button>
                 <button className="text-gray-500 hover:text-white transition-colors">
                   <Mic size={20} />
                 </button>
-                <button
-                  onClick={handleGenerate}
-                  disabled={isLoading}
-                  className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                <button 
+                  onClick={onStart}
+                  className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 transition-all transform hover:scale-105"
                 >
-                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="ml-0.5" />}
+                  <Send size={18} className="ml-0.5" />
                 </button>
               </div>
             </div>
-
-            {/* API Key Input Field */}
-            {showKeyInput && (
-              <div className="mt-4 pt-4 border-t border-white/10 animate-in fade-in slide-in-from-top-2">
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your OpenRouter API Key..."
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-purple-500 transition-colors"
-                />
-              </div>
-            )}
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="flex flex-wrap justify-center gap-4 mt-12">
-          <button
-            onClick={() => { setPrompt('Clone a modern landing page for a SaaS'); handleGenerate(); }}
+          <button 
+            onClick={onStart}
             className="flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 transition-colors"
           >
             <Copy size={16} className="text-gray-400" />
             Clone a website
           </button>
-          <button
-            onClick={() => { setPrompt('Create a personal portfolio website for a designer'); handleGenerate(); }}
+          <button 
+            onClick={onStart}
             className="flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 transition-colors"
           >
             <User size={16} className="text-gray-400" />
             Personal Website
           </button>
-          <button
-            onClick={() => { setPrompt('Generate a high-converting product landing page'); handleGenerate(); }}
+          <button 
+            onClick={onStart}
             className="flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 transition-colors"
           >
             <Rocket size={16} className="text-gray-400" />
