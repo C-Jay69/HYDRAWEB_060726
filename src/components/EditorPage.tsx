@@ -47,7 +47,10 @@ const CustomBlocks = () => {
   );
 };
 
-const EditorPage: React.FC<{ content?: { html: string; css: string } }> = () => {
+const EditorPage: React.FC<{
+  content?: { html: string; css: string };
+  onExit: () => void;
+}> = ({ content, onExit }) => {
   const [editor, setEditor] = useState<Editor | null>(null);
 
   const onEditor = (editorInstance: Editor) => {
