@@ -60,10 +60,16 @@ const EditorPage: React.FC<{
     if (content) {
       // Clear any previous local storage content to ensure a fresh AI start
       editorInstance.setComponents('');
-      editorInstance.setStyleSheet('');
+
+      // Correct way to set global CSS in GrapesJS
+      const cssComposer = editorInstance.CssComposer;
+      if (cssComposer) {
+        cssComposer.clear();
+        // We inject the CSS as a global rule applied to the body or a wrapper
+        cssComposer.addRule('body', content.css);
+      }
 
       editorInstance.setComponents(content.html);
-      editorInstance.setStyleSheet(content.css);
     }
   };
 

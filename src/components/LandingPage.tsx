@@ -59,6 +59,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
           <div className="relative bg-[#0a0a0a] border border-white/10 rounded-2xl p-4 shadow-2xl">
             <textarea
+              id="user-prompt"
+              name="prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Let's create a website for your e-commerce store redesign..."
@@ -106,6 +108,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             {showKeyInput && (
               <div className="mt-4 pt-4 border-t border-white/10 animate-in fade-in slide-in-from-top-2">
                 <input
+                  id="api-key"
+                  name="api_key"
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
