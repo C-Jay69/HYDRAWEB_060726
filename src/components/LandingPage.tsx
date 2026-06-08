@@ -93,7 +93,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   <Mic size={20} />
                 </button>
                 <button
-                  onClick={handleGenerate}
+                  onClick={() => handleGenerate()}
                   disabled={isLoading}
                   className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-500 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

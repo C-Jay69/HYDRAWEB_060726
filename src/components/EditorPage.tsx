@@ -105,7 +105,7 @@ const EditorPage: React.FC<{
         grapesjs={grapesjs}
         options={{
           height: '100%',
-          storageManager: {
+          storageManager: content ? false : {
             type: 'local',
             autosave: true,
             hostname: 'localhost',
