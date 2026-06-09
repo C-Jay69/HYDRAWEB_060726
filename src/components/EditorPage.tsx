@@ -118,6 +118,8 @@ const EditorPage: React.FC<{
             plugins: [gjsBasicBlocks],
             storageKey: 'hydraweb-project-save',
           },
+          components: content ? content.html : '',
+          style: content ? content.css : '',
           plugins: [gjsBasicBlocks],
         }}
         onReady={onEditor}
