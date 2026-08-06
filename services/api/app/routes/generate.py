@@ -5,13 +5,13 @@ import uuid
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..deps import get_project_or_404, rate_limited_user
 from ..llm.service import stream_generate, stream_refine
-from ..models import ChatMessage, User
+from ..models import ChatMessage, Project, User
 from ..schemas.project import (
     ApplySuggestion,
     ChatMessageOut,
@@ -46,6 +46,7 @@ async def generate_site(
     await db.commit()
 
     async def event_stream():
+        saved_version = False
         try:
             async for event in stream_generate(
                 db, user, project, body.prompt, body.include_backend, body.include_db, body.model
@@ -73,10 +74,17 @@ async def generate_site(
                         )
                     )
                     await db.commit()
+                    saved_version = True
                     event = {"type": "result", "data": data, "version": version.version}
                 yield _sse(event)
         except Exception as exc:  # pragma: no cover
             yield _sse({"type": "error", "message": f"Unexpected error: {exc}"})
+        finally:
+            if not saved_version:
+                await db.execute(
+                    update(Project).where(Project.id == project.id).values(status="draft")
+                )
+                await db.commit()
 
     return StreamingResponse(event_stream(), media_type="text/event-stream", headers=SSE_HEADERS)
 
