@@ -1,15 +1,16 @@
 """Stripe billing: plans, checkout, portal, one-time payments, webhooks, invoices."""
 
 import logging
+from datetime import UTC
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
 from ..database import get_db
 from ..deps import rate_limited_user
-from ..models import Subscription, User
+from ..models import User
 from ..schemas.billing import (
     BillingPortalResponse,
     CheckoutRequest,
@@ -187,11 +188,11 @@ async def _handle_event(db: AsyncSession, event) -> None:
                 sub = await stripe_service.get_or_create_subscription(db, user)
                 sub.status = "active"
                 if data.get("period_start") or data.get("period_end"):
-                    from datetime import datetime, timezone
+                    from datetime import datetime
 
                     period_end = data.get("period_end")
                     if period_end:
-                        sub.current_period_end = datetime.fromtimestamp(period_end, tz=timezone.utc)
+                        sub.current_period_end = datetime.fromtimestamp(period_end, tz=UTC)
                 await db.commit()
 
     elif event_type == "payment_intent.succeeded":

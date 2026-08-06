@@ -1,7 +1,7 @@
 """Admin analytics and moderation endpoints (role-gated)."""
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, select
@@ -33,7 +33,7 @@ async def admin_stats(
     )
     revenue = one_time_revenue
 
-    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    week_ago = datetime.now(UTC) - timedelta(days=7)
     signups_7d = (
         await db.scalar(select(func.count(User.id)).where(User.created_at >= week_ago)) or 0
     )

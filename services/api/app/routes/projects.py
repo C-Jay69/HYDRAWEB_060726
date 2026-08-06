@@ -164,8 +164,9 @@ async def rollback_to_version(
     if target is None:
         raise HTTPException(status_code=404, detail="Version not found")
 
-    from ..models import ProjectVersion as PV
     from sqlalchemy import update
+
+    from ..models import ProjectVersion as PV
 
     latest = project.latest_version + 1
     new_version = PV(

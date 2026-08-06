@@ -3,14 +3,13 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..deps import get_project_or_404, rate_limited_user
-from ..models import Deployment, Project, ProjectVersion, User
-from ..schemas.project import DeployRequest, DeploymentOut
+from ..models import Deployment, User
+from ..schemas.project import DeploymentOut, DeployRequest
 from ..services.deploy_service import deploy, get_latest_version, read_site
 from ..services.export_service import build_site_zip
 

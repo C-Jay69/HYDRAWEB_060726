@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from .config import settings
 from .database import SessionLocal
-from .models import Project, Subscription, User
+from .models import Subscription, User
 from .security import hash_password
 
 logging.basicConfig(level=logging.INFO)

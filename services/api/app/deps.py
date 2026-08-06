@@ -2,7 +2,7 @@
 
 import hashlib
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import Depends, Header, HTTPException, Request
 from sqlalchemy import select
@@ -41,7 +41,7 @@ async def resolve_identity(
             raise InvalidCredentials()
         if user.is_banned:
             raise HTTPException(status_code=403, detail="This account has been suspended.")
-        api_key.last_used_at = datetime.now(timezone.utc)
+        api_key.last_used_at = datetime.now(UTC)
         await db.flush()
         return user, f"key:{api_key.id}"
 

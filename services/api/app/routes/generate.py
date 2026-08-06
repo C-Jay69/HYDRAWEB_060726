@@ -3,7 +3,7 @@
 import json
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..database import get_db
 from ..deps import get_project_or_404, rate_limited_user
 from ..llm.service import stream_generate, stream_refine
-from ..models import ChatMessage, Project, User
+from ..models import ChatMessage, User
 from ..schemas.project import (
     ApplySuggestion,
     ChatMessageOut,

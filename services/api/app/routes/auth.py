@@ -1,5 +1,7 @@
 """Authentication: signup, login, verification, password reset, OAuth."""
 
+from datetime import UTC
+
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
@@ -21,7 +23,7 @@ from ..schemas.auth import (
 )
 from ..security import create_access_token, decode_token, hash_password, verify_password
 from ..services.email import send_mail
-from ..services.stripe_service import ensure_customer, get_or_create_subscription
+from ..services.stripe_service import ensure_customer
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -109,9 +111,9 @@ async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if user.is_banned:
         raise HTTPException(status_code=403, detail="This account has been suspended.")
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    user.last_login = datetime.now(timezone.utc)
+    user.last_login = datetime.now(UTC)
     await db.commit()
     return await _token_response(db, user)
 
@@ -334,9 +336,9 @@ async def _handle_oauth_user(db: AsyncSession, provider: str, profile: dict):
             user.avatar_url = profile["avatar_url"]
         user.is_verified = True
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    user.last_login = datetime.now(timezone.utc)
+    user.last_login = datetime.now(UTC)
     await db.commit()
     await db.refresh(user)
     resp = await _token_response(db, user)

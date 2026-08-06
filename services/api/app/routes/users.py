@@ -13,7 +13,7 @@ from ..database import get_db
 from ..deps import rate_limited_user, user_plan
 from ..models import ApiKey, User
 from ..schemas.auth import ProfileUpdate, UserPublic
-from ..schemas.billing import ApiKeyCreated, ApiKeyCreate, ApiKeyOut, SubscriptionOut
+from ..schemas.billing import ApiKeyCreate, ApiKeyCreated, ApiKeyOut, SubscriptionOut
 
 router = APIRouter(tags=["users"])
 

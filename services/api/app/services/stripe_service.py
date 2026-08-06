@@ -1,7 +1,7 @@
 """Stripe subscriptions, one-time payments, portal, and webhook sync."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import stripe
 from sqlalchemy import select
@@ -145,4 +145,4 @@ def current_period_end_from(sub: stripe.Subscription) -> datetime | None:
         period = data[0]["current_period_end"]
     elif sub.get("current_period_end"):
         period = sub["current_period_end"]
-    return datetime.fromtimestamp(period, tz=timezone.utc) if period else None
+    return datetime.fromtimestamp(period, tz=UTC) if period else None

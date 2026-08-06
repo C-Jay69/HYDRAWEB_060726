@@ -4,8 +4,6 @@ import io
 import zipfile
 from pathlib import Path
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from ..models import Project, ProjectVersion
 
 
