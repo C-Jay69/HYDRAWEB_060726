@@ -1,32 +1,19 @@
 {
-  "name": "react-vite-tailwind",
+  "name": "hydraweb",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "description": "HydraWeb — AI-powered website generation and vibe coding SaaS platform",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@grapesjs/react": "^2.0.0",
-    "clsx": "^2.1.1",
-    "grapesjs": "^0.22.15",
-    "grapesjs-blocks-basic": "^1.0.2",
-    "lucide-react": "^1.9.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "tailwind-merge": "^3.4.0"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "4.1.17",
-    "@types/node": "22.19.17",
-    "@types/react": "19.2.7",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "5.1.1",
-    "tailwindcss": "4.1.17",
-    "typescript": "5.9.3",
-    "vite": "7.2.4",
-    "vite-plugin-singlefile": "2.3.0"
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d postgres redis",
+    "infra:down": "docker compose -f infra/docker-compose.yml down",
+    "api:install": "cd services/api && pip install -r requirements.txt",
+    "api:migrate": "cd services/api && alembic upgrade head",
+    "api:seed": "cd services/api && python -m app.seed",
+    "api:dev": "cd services/api && uvicorn app.main:app --reload --port 8000",
+    "api:test": "cd services/api && pytest",
+    "web:install": "cd apps/web && npm install",
+    "web:dev": "cd apps/web && npm run dev",
+    "web:build": "cd apps/web && npm run build",
+    "web:lint": "cd apps/web && npm run lint"
   }
 }
