@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     # LLM (OpenRouter gateway)
     openrouter_api_key: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    llm_model: str = "openai/gpt-4o"
+    llm_model: str = "openrouter/free"
     llm_temperature: float = 0.7
     llm_max_tokens: int = 8000
     llm_cache_ttl: int = 3600
