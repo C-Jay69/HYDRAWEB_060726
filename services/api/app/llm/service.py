@@ -50,13 +50,80 @@ def _cost_estimate(model: str, prompt_tokens: int, completion_tokens: int) -> fl
     return (prompt_tokens * prices[0] + completion_tokens * prices[1]) / 1000.0
 
 
-def extract_json(text: str) -> dict:
+def _extract_balanced_object(text: str) -> str:
+    """Return the first top-level balanced JSON object, honoring nested braces inside strings."""
     start = text.find("{")
-    end = text.rfind("}")
-    if start == -1 or end == -1:
+    if start == -1:
+        return ""
+    depth = 0
+    in_string = False
+    escaped = False
+    for i in range(start, len(text)):
+        c = text[i]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif c == "\\":
+                escaped = True
+            elif c == '"':
+                in_string = False
+        else:
+            if c == '"':
+                in_string = True
+            elif c == "{":
+                depth += 1
+            elif c == "}":
+                depth -= 1
+                if depth == 0:
+                    return text[start : i + 1]
+    return ""
+
+
+def _fix_single_quotes(s: str) -> str:
+    """Best-effort conversion of single-quoted strings to double-quoted JSON strings."""
+    out: list[str] = []
+    i = 0
+    n = len(s)
+    while i < n:
+        c = s[i]
+        if c == "'":
+            j = i + 1
+            buf: list[str] = []
+            while j < n:
+                if s[j] == "\\":
+                    buf.append(s[j : j + 2])
+                    j += 2
+                    continue
+                if s[j] == "'":
+                    break
+                buf.append(s[j])
+                j += 1
+            if j < n:
+                out.append('"' + "".join(buf).replace('"', '\\"') + '"')
+                i = j + 1
+                continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+def extract_json(text: str) -> dict:
+    # Strip optional markdown code fences (```json ... ```).
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        inner = stripped.strip("`").strip()
+        if inner.lower().startswith("json"):
+            inner = inner[4:].lstrip()
+        text = inner
+    raw = _extract_balanced_object(text)
+    if not raw:
         raise LLMError("Model did not return a JSON object.")
     try:
-        return json.loads(text[start : end + 1])
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+    try:
+        return json.loads(_fix_single_quotes(raw))
     except json.JSONDecodeError as exc:
         raise LLMError(f"Model returned malformed JSON: {exc}") from exc
 
