@@ -37,7 +37,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://hydraweb:hydraweb@postgres:5432/hydraweb
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "8011:8011"
+      - "8012:8011"
     volumes:
       - ../services/api:/app
       - api_storage:/app/storage
@@ -54,7 +54,7 @@ services:
       dockerfile: Dockerfile
     container_name: hydraweb_web
     environment:
-      API_URL: http://localhost:8011
+      API_URL: http://localhost:8012
       NODE_ENV: development
     ports:
       - "3000:3000"
