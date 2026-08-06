@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings,
   Boxes,
+  Shield,
   UserCircle2,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -28,6 +29,7 @@ const NAV = [
 export function AppShell({ user, children }: { user: User; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const nav = user.role === 'admin' ? [...NAV, { href: '/admin', label: 'Admin', icon: Shield }] : NAV;
 
   async function logout() {
     await fetch('/api/logout', { method: 'POST' });
@@ -44,7 +46,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
             <Logo />
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
-            {NAV.map((item) => {
+            {nav.map((item) => {
               const active = pathname.startsWith(item.href);
               return (
                 <Link
@@ -88,7 +90,7 @@ export function AppShell({ user, children }: { user: User; children: React.React
           </div>
         </div>
         <nav className="flex items-center gap-1 border-t border-border/40 px-4 py-2 md:hidden">
-          {NAV.map((item) => {
+          {nav.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link

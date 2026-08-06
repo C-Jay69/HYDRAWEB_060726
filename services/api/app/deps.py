@@ -69,6 +69,9 @@ async def _ensure_active(user: User) -> None:
 
 
 async def user_plan(db: AsyncSession, user: User) -> str:
+    # Admins are always treated as enterprise: unlimited projects + highest rate limits.
+    if user.role == "admin":
+        return "enterprise"
     result = await db.execute(select(Subscription).where(Subscription.user_id == user.id))
     sub = result.scalar_one_or_none()
     if sub and sub.plan_tier in ("pro", "enterprise") and sub.status == "active":

@@ -9,7 +9,7 @@
     "api:install": "cd services/api && uv pip install -r requirements.txt",
     "api:migrate": "cd services/api && uv run alembic upgrade head",
     "api:seed": "cd services/api && uv run python -m app.seed",
-    "api:dev": "cd services/api && uv run uvicorn app.main:app --reload --port 8000",
+    "api:dev": "cd services/api && uv run uvicorn app.main:app --reload --port 8011",
     "api:test": "cd services/api && uv run pytest",
     "web:install": "cd apps/web && npm install",
     "web:dev": "cd apps/web && npm run dev",

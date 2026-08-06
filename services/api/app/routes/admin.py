@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..database import get_db
 from ..deps import require_admin
-from ..models import ApiKey, Deployment, LlmUsage, OneTimePayment, Project, Team, User
+from ..models import ApiKey, Deployment, LlmUsage, OneTimePayment, Project, Subscription, Team, User
 from ..schemas.admin import AdminStats
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -89,4 +89,99 @@ async def admin_users(db: AsyncSession = Depends(get_db), _: User = Depends(requ
             "created_at": u.created_at,
         }
         for u in result.scalars().all()
+    ]
+
+
+@router.get("/projects", response_model=list[dict])
+async def admin_projects(db: AsyncSession = Depends(get_db), _: User = Depends(require_admin)):
+    result = await db.execute(
+        select(Project, User.email, User.name)
+        .join(User, User.id == Project.user_id)
+        .order_by(Project.updated_at.desc())
+        .limit(200)
+    )
+    return [
+        {
+            "id": str(p.id),
+            "name": p.name,
+            "slug": p.slug,
+            "status": p.status,
+            "latest_version": p.latest_version,
+            "visibility": p.visibility,
+            "owner_email": email,
+            "owner_name": name,
+            "created_at": p.created_at,
+            "updated_at": p.updated_at,
+        }
+        for p, email, name in result.all()
+    ]
+
+
+@router.get("/usage", response_model=list[dict])
+async def admin_usage(db: AsyncSession = Depends(get_db), _: User = Depends(require_admin)):
+    result = await db.execute(
+        select(LlmUsage, User.email)
+        .join(User, User.id == LlmUsage.user_id, isouter=True)
+        .order_by(LlmUsage.created_at.desc())
+        .limit(100)
+    )
+    return [
+        {
+            "id": str(u.id),
+            "email": email,
+            "model": u.model,
+            "endpoint": u.endpoint,
+            "prompt_tokens": u.prompt_tokens,
+            "completion_tokens": u.completion_tokens,
+            "total_tokens": u.total_tokens,
+            "cost_estimate": u.cost_estimate,
+            "cached": u.cached,
+            "created_at": u.created_at,
+        }
+        for u, email in result.all()
+    ]
+
+
+@router.get("/payments", response_model=list[dict])
+async def admin_payments(db: AsyncSession = Depends(get_db), _: User = Depends(require_admin)):
+    result = await db.execute(
+        select(OneTimePayment, User.email)
+        .join(User, User.id == OneTimePayment.user_id, isouter=True)
+        .order_by(OneTimePayment.created_at.desc())
+        .limit(100)
+    )
+    return [
+        {
+            "id": str(p.id),
+            "email": email,
+            "amount": p.amount,
+            "currency": p.currency,
+            "product_name": p.product_name,
+            "stripe_payment_intent_id": p.stripe_payment_intent_id,
+            "created_at": p.created_at,
+        }
+        for p, email in result.all()
+    ]
+
+
+@router.get("/subscriptions", response_model=list[dict])
+async def admin_subscriptions(db: AsyncSession = Depends(get_db), _: User = Depends(require_admin)):
+    result = await db.execute(
+        select(Subscription, User.email)
+        .join(User, User.id == Subscription.user_id)
+        .order_by(Subscription.updated_at.desc())
+        .limit(200)
+    )
+    return [
+        {
+            "id": str(s.id),
+            "email": email,
+            "plan_tier": s.plan_tier,
+            "status": s.status,
+            "billing_cycle": s.billing_cycle,
+            "current_period_end": s.current_period_end,
+            "stripe_subscription_id": s.stripe_subscription_id,
+            "updated_at": s.updated_at,
+        }
+        for s, email in result.all()
     ]

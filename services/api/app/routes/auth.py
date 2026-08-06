@@ -45,6 +45,8 @@ def _user_public(user: User, plan: str) -> UserPublic:
 
 
 async def _plan_for(db: AsyncSession, user: User) -> str:
+    if user.role == "admin":
+        return "enterprise"
     result = await db.execute(select(Subscription).where(Subscription.user_id == user.id))
     sub = result.scalar_one_or_none()
     if sub and sub.plan_tier in ("pro", "enterprise") and sub.status == "active":

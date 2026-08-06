@@ -37,7 +37,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://hydraweb:hydraweb@postgres:5432/hydraweb
       REDIS_URL: redis://redis:6379/0
     ports:
-      - "8000:8000"
+      - "8011:8011"
     volumes:
       - ../services/api:/app
       - api_storage:/app/storage
@@ -46,7 +46,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8011 --reload
 
   web:
     build:
@@ -54,7 +54,7 @@ services:
       dockerfile: Dockerfile
     container_name: hydraweb_web
     environment:
-      API_URL: http://localhost:8000
+      API_URL: http://localhost:8011
       NODE_ENV: development
     ports:
       - "3000:3000"

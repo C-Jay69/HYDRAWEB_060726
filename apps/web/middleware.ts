@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PROTECTED = ['/dashboard', '/editor', '/projects', '/billing', '/settings'];
+const PROTECTED = ['/dashboard', '/editor', '/projects', '/billing', '/settings', '/admin'];
 const PUBLIC_ONLY = ['/login', '/signup', '/reset-password'];
 
 export function middleware(request: NextRequest) {
@@ -35,6 +35,7 @@ export const config = {
     '/projects/:path*',
     '/billing/:path*',
     '/settings/:path*',
+    '/admin/:path*',
     '/login',
     '/signup',
     '/reset-password',

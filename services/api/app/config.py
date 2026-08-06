@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     app_name: str = "HydraWeb API"
     environment: str = "development"
-    api_url: str = "http://localhost:8000"
+    api_url: str = "http://localhost:8011"
     frontend_url: str = "http://localhost:3000"
     platform_domain: str = "myplatform.dev"
 
